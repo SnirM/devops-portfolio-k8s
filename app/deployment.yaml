@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devops-portfolio-app
+  namespace: devops-portfolio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devops-portfolio-app
+  template:
+    metadata:
+      labels:
+        app: devops-portfolio-app
+    spec:
+      containers:
+        - name: app
+          image: 807650718119.dkr.ecr.ap-south-1.amazonaws.com/devops-portfolio-app:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DATABASE_URL
+              value: postgresql://appuser:apppass@postgres:5432/appdb
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 20
